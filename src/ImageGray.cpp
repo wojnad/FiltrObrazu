@@ -2,14 +2,14 @@
 // Created by wojnad on 08.11.2023.
 //
 
-#include "Image.h"
+#include "ImageGray.h"
 #include <bits/stdc++.h>
 
-Image::Image() {
+ImageGray::ImageGray() {
     width=0, height=0, max_pix_val=0;
 }
 
-Image::Image(const std::string& img_path) {
+ImageGray::ImageGray(const std::string& img_path) {
     std::fstream img_file(img_path, std::fstream::in);
     if (!img_file.good()){ // Sprawdzenie, czy plik jest dostępny.
         img_file.close();
@@ -40,15 +40,20 @@ Image::Image(const std::string& img_path) {
             }
             n_line++;
         }
+        if (pix_matrix.size() != width*height){ // Zadeklarowana wielkość nie odpowiada zczytanej
+            std::cerr << "Blad rozmiaru obrazu!";
+            exit(-1);
+        }
         img_file.close();
     }
     else{
+        std::cerr << "Blad dostepu do pliku obrazu!";
         img_file.close();
         exit(-1);
     }
 }
 
-void Image::print() {
+void ImageGray::print() {
     std::cout << "Width: " << this->width << " Height: " << this->height <<std::endl;
     std::cout << "Max value: " << this->max_pix_val <<std::endl;
 
@@ -61,13 +66,13 @@ void Image::print() {
     }
 }
 
-void Image::reverse_gray(){
+void ImageGray::reverse_gray(){
     for (int i = 0; i < this->height * this->width; ++i){
         this->pix_matrix[i] = max_pix_val - this->pix_matrix[i];
     }
 }
 
-double Image::calc_pixel(int row_n, int col_n, const Filter &filter, const std::vector<int>& old_pix_matrix) {
+double ImageGray::calc_pixel(int row_n, int col_n, const Filter &filter, const std::vector<int>& old_pix_matrix) {
     double result = 0;
 
     for (int i=0; i<filter.size; ++i){
@@ -88,19 +93,19 @@ double Image::calc_pixel(int row_n, int col_n, const Filter &filter, const std::
     return round(result); // Zwracana jest wartość zaokrąglona, bo piksele zapisane są jako liczby całkowite.
 }
 
-void Image::calc_row(int row_n, const Filter& filter, const std::vector<int>& old_pix_matrix){
+void ImageGray::calc_row(int row_n, const Filter& filter, const std::vector<int>& old_pix_matrix){
     for (int cur_col = 0; cur_col<this->width; ++cur_col){ //Przejście przez wszystkie kolumny wiersza
         this->pix_matrix[row_n * this->width+cur_col] = static_cast<int>(calc_pixel(row_n, cur_col, filter, old_pix_matrix));
     }
 }
 
-void Image::thread_calc_row(int start_row, int threads_num, const Filter& filter, const std::vector<int>& old_pix_matrix) {
+void ImageGray::thread_calc_row(int start_row, int threads_num, const Filter& filter, const std::vector<int>& old_pix_matrix) {
     for (int cur_row = start_row; cur_row < this->height; cur_row += threads_num){
         this->calc_row(cur_row, filter, old_pix_matrix);
     }
 }
 
-void Image::normalize_pic() {
+void ImageGray::normalize_pic() {
     const auto [min_ptr, max_ptr] = std::minmax_element(this->pix_matrix.begin(), this->pix_matrix.end());
     int min = *min_ptr, max = *max_ptr; // Odczytanie wartości minimalnej i maksymalnej obrazka
     if (min < 0){
@@ -112,7 +117,7 @@ void Image::normalize_pic() {
 
 }
 
-void Image::apply_filter(const Filter &filter) {
+void ImageGray::apply_filter(const Filter &filter) {
     std::vector<int> old_pix_matrix(this->pix_matrix); // Przekopiowane pierwotne wartości pikseli
     for (int i=0; i<this->height; ++i){
         for (int j=0; j< this->width; ++j){
@@ -145,10 +150,10 @@ void Image::apply_filter(const Filter &filter) {
     }*/
 }
 
-int Image::save_image(const std::string& dst_path) {
+int ImageGray::save_image(const std::string& dst_path) {
     std::ofstream img_file(dst_path, std::fstream::out);
     if (!img_file.good()){
-        std::cerr << "Nie mozna uzyskac dostepu do pliku wejsciowego!";
+        std::cerr << "Nie mozna uzyskac dostepu do pliku wyjsciowego!";
         return -1;
     }
     if (img_file.is_open()){
@@ -171,11 +176,12 @@ int Image::save_image(const std::string& dst_path) {
     }
 }
 
-void Image::apply_filter_threads(const Filter& filter, unsigned int num_threads){
+void ImageGray::apply_filter_threads(const Filter& filter, unsigned int num_threads){
     std::vector<int> old_pix_matrix(this->pix_matrix); // Przekopiowane pierwotne wartości pikseli
     std::vector<std::thread> threads; // Wektor wątków
     for (unsigned int i=0; i<num_threads; ++i){
-        threads.emplace_back(&Image::thread_calc_row, this, i, num_threads, std::ref(filter), std::cref(old_pix_matrix));
+        threads.emplace_back(&ImageGray::thread_calc_row, this, i, num_threads,
+                             std::ref(filter), std::cref(old_pix_matrix));
         //Konfiguracja wątku
     }
     for (std::thread& thread: threads){

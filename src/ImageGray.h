@@ -43,15 +43,16 @@ public:
 };
 
 /**
- * \class Image
+ * \class ImageGray
  *
- * Klasa obrazu o rozmiarze width x height przechowująca wartość pikseli w kontenerze std::vector
+ * Klasa obrazu w odcieniach szarości o rozmiarze width x height przechowująca wartość pikseli w kontenerze std::vector
  * liczb całkowitych. Max_pix_val
  * zczytywany jest automatycznie z pliku .pgm.
  *
- * Program na razie obsługuje wyłącznie pliki monochromatyczne formatu .pgm.
+ * Klasa obsługuje wyłącznie pliki monochromatyczne formatu .pgm.
  * */
-class Image{
+class ImageGray{
+private:
     /// Szerokość i wysokość obrazu
     int width, height;
     /// Maksymalna wartość piksela zczytana z pliku pgm
@@ -90,12 +91,12 @@ class Image{
 
 public:
     ///Konstruktor domyślny tworzący pusty obraz 0x0
-    Image();
+    ImageGray();
     /**
      * Konstruktor odczytujący wartości z pliku .pgm przechowującego obraz
      * @param img_path - Ścieżka do pliku .pgm*/
-    Image(const std::string& img_path);
-    //~Image();
+    ImageGray(const std::string& img_path);
+    //~ImageGray();
     /**
      * Metoda, która przy użyciu metoda calc_pixel przelicza w pętli wartości dla wszystkich pikseli obrazu
      * @param filter - Referencja do używanego w algorytmie filtra
