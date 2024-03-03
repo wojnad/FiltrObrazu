@@ -41,4 +41,8 @@ public:
     double sumK;
 };
 
+/// @brief Usunięcie białych znaków z danego std::string
+void removeWhitespace(std::string& str);
+
+
 #endif //FILTROBRAZU_FILTER_H

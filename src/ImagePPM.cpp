@@ -34,8 +34,10 @@ ImagePPM::ImagePPM(const std::string &img_path) {
     std::string line;
     int n_line = 2;
 
-    std::getline(img, line);
-    this->magic_seq = line;
+    /*std::getline(img, line);
+    this->magic_seq = line;*/
+    img >> this->magic_seq;
+    img.ignore(1);
     if (this->magic_seq == "P3"){
         while(std::getline(img, line)){
             if (line.starts_with("#")) continue;
@@ -58,7 +60,23 @@ ImagePPM::ImagePPM(const std::string &img_path) {
         }
     }
     else if (this->magic_seq == "P6"){
-        while(std::getline(img, line)){
+        if (img.peek() == '#'){
+            img.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        img >> width >> height >> max_pix_val;
+        img.ignore(1);
+
+        for (int i = 0; i < width*height; ++i){
+            RGBPixel_int32 temp_pix_val = {0,0,0};
+            temp_pix_val.r = static_cast<int>(img.get());
+            temp_pix_val.g = static_cast<int>(img.get());
+            temp_pix_val.b = static_cast<int>(img.get());
+            this->pix_map.push_back(temp_pix_val);
+        }
+
+        img.close();
+
+        /*while(std::getline(img, line)){
             std::stringstream line_buffer(line);
             switch (n_line) {
                 case 2:
@@ -78,8 +96,7 @@ ImagePPM::ImagePPM(const std::string &img_path) {
                     }
                     break;
             }
-            n_line++;
-        }
+            n_line++;*/
 
     }
     else{
@@ -213,4 +230,20 @@ void ImagePPM::save_image(const std::string &dst_path) {
 
     std::cout << "Poprawnie zapisano plik w lokalizacji: " << dst_path << std::endl;
     img.close();
+}
+
+void ImagePPM::resize_NN(int new_width, int new_height) {
+    std::vector<RGBPixel_int32> old_pix_map(this->pix_map);
+    this->pix_map.clear();
+    this->pix_map.resize(new_height*new_width);
+
+    for (int new_row = 0; new_row < new_height; ++new_row){
+        for (int new_col = 0; new_col < new_width; ++new_col){
+            int old_row = static_cast<int>(new_row * height / static_cast<double>(new_height));
+            int old_col = static_cast<int>(new_col * width / static_cast<double>(new_width));
+            this->pix_map[new_row*new_width+new_col] = old_pix_map[old_row*width+old_col];
+        }
+    }
+    width = new_width;
+    height = new_height;
 }
