@@ -34,3 +34,7 @@ Filter::Filter(const std::string &filter_path) {
     std::cout << "Poprawnie wczytano filtr z lokalizacji: " << filter_path << std::endl;
     filter.close();
 }
+
+void removeWhitespace(std::string &str) {
+    str.erase(std::remove_if(str.begin(), str.end(), [](unsigned char x) { return std::isspace(x); }), str.end());
+}

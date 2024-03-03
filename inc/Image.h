@@ -9,6 +9,8 @@
 
 class Filter;
 
+
+
 class Image{
 public:
     std::string magic_seq; //Kod z początku pliku
@@ -38,6 +40,12 @@ public:
      * @param dst_path Ścieżka docelowa pliku
      * */
     virtual void save_image(const std::string& dst_path) = 0; //Zapisywanie wirtualne;
+    /**
+     * @brief Zmiana rozmiaru obrazu na podstawie algorytmu najbliższego sąsiada
+     * @param new_width Nowa szerokość obrazu
+     * @param new_height Nowa wysokość obrazu
+     * */
+    virtual void resize_NN(int new_width, int new_height) = 0;
 };
 
 #endif //FILTROBRAZU_IMAGE_H

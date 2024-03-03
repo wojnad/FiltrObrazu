@@ -40,7 +40,7 @@ class ImagePGM : private Image{
       * @brief Przeliczanie poszczególnych pikseli w jednym wierszu obrazu
       * @param row_n Numer wiersza w obrazie
       * @param filter Referencja do stosowanego filtra
-      * @param old_pix_map Kopia pierwotnej mapy pikseli
+      * @param old_pix_map Referencja do kopii pierwotnej mapy pikseli
       * */
      void calc_row(int row_n, const Filter& filter, const std::vector<int>& old_pix_map);
      /**
@@ -62,11 +62,17 @@ public:
      * @brief Konstruktor tworzący obraz na podstawie danych odczytanych z pliku .pgm
      * @param img_path Ścieżka do pliku .pgm
      * */
-    ImagePGM(const std::string& img_path);
+    explicit ImagePGM(const std::string& img_path);
     /**
      * Konstruktor tworzący czarny obraz o podanych wymiarach
      * */
     ImagePGM(int width, int height, bool is_binary);
+    /**
+     * @brief Funkcja zmieniająca rozmiar obrazu na podstawie algorytmu najbliższego sąsiada
+     * @param new_width Nowa szerokość obrazu
+     * @param new_height Nowa wysokość obrazu
+     * */
+     void resize_NN(int new_width, int new_height) override;
     /**
      * @brief Aplikowanie zadanego filtra na obrazie
      *

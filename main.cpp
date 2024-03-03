@@ -26,6 +26,11 @@ int main(int argc, char* argv[]){
                     filtering(args[1], args[2], args[3], 1);
                 }
             }
+            if (args[0] == "-rs"){
+                ImagePGM img(args[1]);
+                img.resize_NN(std::stoi(args[2]), std::stoi(args[3]));
+                img.save_image(args[4]);
+            }
         }
 
     }
