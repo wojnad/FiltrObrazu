@@ -1,3 +1,2 @@
-# FiltrObrazu
-
-Program stworzony w ramach tutoringu w semestrze zimowym 2023.
+# Filtracja Obrazu
+Jest to jedna z metod cyfrowego przetwarzania sygnału. Jest ona operacją na pikselach obrazu źródłowego, w wyniku której powstaje nowy, przekstałcony obraz. Określa się ją jako przekształcenie kontekstowe ponieważ w celu wyznaczenia nowej wartości piksela potrzebna jest informacja z wielu pikseli obrazu źródłowego. ([Wikipedia] (https://pl.wikipedia.org/wiki/Filtracja_obraz%C3%B3w))
