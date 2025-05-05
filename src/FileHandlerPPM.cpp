@@ -25,16 +25,18 @@ wnImage FileHandlerPPM::readFile(const std::string &srcPath) {
     srcFile >> magicSequence;
     if (magicSequence != "P6" && magicSequence != "P3"){
         throw std::runtime_error("Nie mozna odczytac pliku - bledna magiczna sekwencja");
+
     }
 
-    srcFile.ignore(1);
+    srcFile >> std::ws;
 
     while (srcFile.peek() == '#'){
         srcFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        srcFile >> std::ws;
     }
 
     srcFile >> width >> height >> maxPixValue;
-    srcFile.ignore(1);
+    srcFile >> std::ws;
     rawData.resize(width*height*3, 0);
 
     switch (magicSequence[1]) {

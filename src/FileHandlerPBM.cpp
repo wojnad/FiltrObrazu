@@ -28,12 +28,13 @@ wnImage FileHandlerPBM::readFile(const std::string &srcPath) {
         throw std::runtime_error("Nie mozna odczytac pliku - bledna magiczna sekwecja");
     }
 
-    srcFile.ignore(1);
+    srcFile >> std::ws;
     while (srcFile.peek() == '#'){
         srcFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        srcFile >> std::ws;
     }
     srcFile >> width >> height;
-    srcFile.ignore(1);
+    srcFile >> std::ws;
 
     rawData.resize(width*height, 0);
     switch (magicSequence[1]){

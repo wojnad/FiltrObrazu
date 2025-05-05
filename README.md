@@ -40,6 +40,15 @@ Po uruchomieniu wyświetli się menu z opcjami.
   > Opcja: 7 # Zapis obrazu
 ```
 
+## Format filtra
+Stosowany w programie plik opisujący stosowany filtr opiera się na formacie PAM w formacie ASCII.
+
+Struktura pliku:
+```
+[Wysokość] [Szerokość]
+[Wagi filtra (liczby zmiennoprzecinkowe) rozdzielone białym znakiem]
+```
+
 ## Struktura projetku
 
 ```
@@ -59,3 +68,9 @@ Po uruchomieniu wyświetli się menu z opcjami.
 ├── CMakeLists.txt     # Konfiguracja CMake
 └── README.md          # Ten plik
 ```
+
+## TO DO
+1. Obsługa innych formatów plików obrazów (JPG, PNG, TIFF).
+2. Rozdzielenie logiki operacji na obrazie od obrazu.
+3. Implementacja historii operacji na obrazie.
+4. Obsługa filtrów binarnych

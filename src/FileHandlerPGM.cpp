@@ -28,13 +28,14 @@ wnImage FileHandlerPGM::readFile(const std::string &srcPath) {
     if (magicSequence != "P5" && magicSequence != "P2"){
         throw std::runtime_error("Nie mozna odczytac pliku - bledna magiczna sekwencja");
     }
-    //std::cout << magicSequence << "\n";
-    srcFile.ignore(1);
+    srcFile >> std::ws;
+
     while (srcFile.peek() == '#') {
         srcFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        srcFile >> std::ws;
     }
     srcFile >> width >> height >> maxPixValue;
-    srcFile.ignore(1);
+    srcFile >> std::ws;
 
     switch (magicSequence[1]){
         case '2':
@@ -63,15 +64,6 @@ wnImage FileHandlerPGM::readFile(const std::string &srcPath) {
 
     wnImage newImage(height, width, maxPixValue, std::cref(rawData), fileTypes::PGM);
 
-//    for (int i=0; i<height; ++i){
-//        for (int j=0; j<width; ++j){
-//            std::cout << rawData[j + i * width] << " ";
-//        }
-//        std::cout << "\n";
-//    }
-//
-
-    //newImage.showPixValues();
 
     return newImage;
 }
