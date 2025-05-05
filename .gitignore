@@ -1,5 +1,2 @@
-/cmake-build-debug/
-/src_old/
-/build
-/inc/ImageBMP.h
-/data/Effects
+./cmake-build-debug/
+CMakeCache.txt

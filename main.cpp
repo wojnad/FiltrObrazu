@@ -1,62 +1,67 @@
-//
-// Created by wojnad on 20.12.2023.
-//
+#include <iostream>
+#include "FileHandlerPAM.h"
+#include "FileHandlerFactory.h"
+#include "ConsoleInterface.h"
+#include <windows.h>
 
-#include "Image.h"
-#include "Filter.h"
-#include "ImagePGM.h"
-#include "ImagePPM.h"
-
-void filtering(const std::string& img_path, const std::string& filter_path, const std::string& dst_path, int threads_num);
-
-int main(int argc, char* argv[]){
-    try{
-        if (argc < 4){
-            throw std::runtime_error("Zbyt mala liczba argumentow!\n"
-                                     "Prawidlowa postac:\n"
-                                     "FiltrObrazu.exe -f sciezka_obrazu sciezka_filtra sciezka_docelowa");
-        }
-        else{
-            std::vector<std::string> args(argv+1, argv+argc);
-            if (args[0] == "-f"){
-                if (args.size() == 5){
-                    filtering(args[1], args[2], args[3], std::stoi(args[4]));
-                }
-                else if (args.size() == 4){
-                    filtering(args[1], args[2], args[3], 1);
-                }
-            }
-            if (args[0] == "-rs"){
-                ImagePGM img(args[1]);
-                img.resize_NN(std::stoi(args[2]), std::stoi(args[3]));
-                img.save_image(args[4]);
-            }
-        }
-
-    }
-    catch (std::exception& exp) {
-        std::cerr << exp.what() << '\n';
-    }
-
+void printUsage(const std::string& programName) {
+    std::cout << "Użycie: " << programName << " <ścieżka_wejściowa> [<ścieżka_wyjściowa>] [<typ_pliku>]\n";
+    std::cout << "Dostępne typy plików:\n";
+    std::cout << "  - tga-nieskompresowany (domyślny)\n";
+    std::cout << "  - ppm\n";
+    std::cout << "  - pbm\n";
+    std::cout << "  - pgm\n";
 }
 
-void filtering(const std::string& img_path, const std::string& filter_path, const std::string& dst_path, int threads_num){
-    auto start_time = std::chrono::high_resolution_clock::now();
-    Filter filter(filter_path);
-    if (img_path.ends_with(".pgm")){
-        ImagePGM img(img_path);
-        img.apply_filter_threads(filter, threads_num);
-        img.save_image(dst_path);
+int main(int argc, char** argv){
+    #ifdef _WIN32
+    SetConsoleOutputCP(65001);
+    SetConsoleCP(65001);
+    #else
+    std::locale::global(std::locale(""));
+    std::cout.imbue(std::locale());
+    std::cin.imbue(std::locale());
+    #endif
+
+    try {
+
+        if (argc < 2) {
+            printUsage(argv[0]);
+            return 1;
+        }
+
+        // Parsowanie argumentów
+        const std::string inputPath = argv[1];
+        const std::string outputPath = (argc > 2) ? argv[2] : inputPath;
+
+        fileTypes::types fileType = fileTypes::TGA;
+        if (argc > 3) {
+            std::string typeStr = argv[3];
+            if (typeStr == "ppm") {
+                fileType = fileTypes::PPM;
+            } else if (typeStr == "pgm") {
+                fileType = fileTypes::PGM;
+            } else if (typeStr == "pbm") {
+                fileType = fileTypes::PBM;
+            } else if (typeStr != "tga") {
+                std::cerr << "Nieznany typ pliku: " << typeStr << "\n";
+                printUsage(argv[0]);
+                return 1;
+            }
+        }
+
+        std::unique_ptr<FileHandler> fileHandler = FileHandlerFactory::getFilehander(fileType);
+        wnImage image = fileHandler->readFile(inputPath);
+
+        ConsoleInterface consoleInterface(image);
+        consoleInterface.cliMenu();
+
+        fileHandler->saveFile(outputPath, image);
+
     }
-    else if (img_path.ends_with(".ppm")){
-        ImagePPM img(img_path);
-        img.apply_filter_threads(filter, threads_num);
-        img.save_image(dst_path);
+    catch (std::runtime_error& e) {
+        std::cerr << e.what();
+        return 1;
     }
-    else{
-        throw std::runtime_error("Nieobslugiwany format pliku obrazu!");
-    }
-    auto end_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-    std::cout << "Czas wykonania filtracji dla liczby watkow rownej " << threads_num << ": " << duration.count() << " ms\n";
+    return 0;
 }
